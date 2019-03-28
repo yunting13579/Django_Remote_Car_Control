@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<title>自走車監控頁面</title>
+
+<!-- 新 Bootstrap4 核心 CSS 文件 -->
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<!--<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>-->
+
+<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+<script src="https://intercoolerreleases-leaddynocom.netdna-ssl.com/intercooler-1.1.1.min.js"></script>
+
+<link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<script type="text/javascript" src="https://www.yunting.cf/static/js/underscore-min.js"></script>
+<script type="text/javascript" src="https://www.yunting.cf/static/js/backbone-min.js"></script>
+<script type="text/javascript" src="https://www.yunting.cf/static/js/joystick_view.js"></script>
+<script type="text/javascript" src="https://www.yunting.cf/static/js/jquery-1.11.2.min.js"></script>
+<script src="https://www.yunting.cf/static/js/virtualjoystick.js"></script>
+<!-- import hls.js -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+    /* Always set the map height explicitly to define the size of the div
+    * element that contains the map. */
+	#map {
+    	height: 400px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+    	height: 100%;
+        margin: 0;
+        padding: 0;
+	}
+	#container1 {
+		width		: 100%;
+		height		: 50%;
+		overflow	: hidden;
+		padding		: 0;
+		margin		: 0;
+		-webkit-user-select	: none;
+		-moz-user-select	: none;
+		background-color: rgb(0, 255, 191);
+	}
+	
+</style>
+</head>
+
+<body>
+	
+	<h1 class="text-center font-weight-bold">自走車監控頁面</h1>
+    <div class="container-fluid">
+    	<div data-role="header">
+    		<div data-role="navbar">
+    			<ul>
+    				<li><a href="/home">自走車院端控制</a></li>
+					<li><a href="/GPS_Sheet">GPS狀態</a></li>
+					<li><a href="/robotic_arm">機械手臂控制</a></li>
+					
+				</ul>
+			</div>
+		</div>
+	<div>
+	<div class="container">
+		<div class="row">
+		   	<div class="col-md-6">
+				<button id="forward_Btn" type="button" class="btn btn-default">前進</button>
+				<button id="back_Btn" type="button" class="btn btn-default">後退</button>
+				<button id="left_Btn" type="button" class="btn btn-default">左轉</button>
+				<button id="right_Btn" type="button" class="btn btn-default">右轉</button>
+				<p>現在車車狀態為:<a id='Btn_status'>none</a></p>
+				<div id="container1">
+					<div id="info">
+						<br/>
+							Touch the screen and move
+							-
+							works with mouse too as debug
+						<br/>
+						<span id="result"></span>
+						
+					</div>
+				</div>
+				
+
+			</div>
+		   	<div class="col-md-6">
+				<!-- google map -->
+				<div id="map"></div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+						<th>經緯度</th>
+						<th>座標</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+						<td>經度</td>
+						<td id="lng">{{latest.latitude}}</td>
+						</tr>
+						<tr>
+						<td>緯度</td>
+						<td id="lat">{{latest.longitude}}</td>
+						</tr>
+					</tbody>
+				</table>
+				
+		    </div>
+		    
+		</div>
+
+		<div class="row">
+			<div class="col-md-6">
+				<video id="video" controls src="https://www.yunting.cf/hls/mystream.m3u8"></video>
+				<script>
+					if (Hls.isSupported()) {
+						const video = document.getElementById('video');
+						const hls = new Hls();
+						hls.attachMedia(video);
+	
+						hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+							console.log("video and hls.js are now bound together !");
+							hls.loadSource("https://www.yunting.cf/hls/mystream.m3u8");
+							});
+					}
+				</script>
+			</div>
+
+			<div class="col-md-6">
+				<div class="row">
+					<div class="col-md-4">
+						<img id="top-left" src="https://www.yunting.cf/static/pictures/greenpoint.png" style="display:block; margin:auto;" width="30px" height="30px"/>
+					</div>
+					<div class="col-md-4">
+						<img id="top-center" src="https://www.yunting.cf/static/pictures/greenpoint.png" style="display:block; margin:auto;" width="30px" height="30px"/>
+					</div>
+					<div class="col-md-4">
+						<img id="top-right" src="https://www.yunting.cf/static/pictures/greenpoint.png" style="display:block; margin:auto;" width="30px" height="30px"/>
+					</div>
+					
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<img src="https://www.yunting.cf/static/pictures/car_up.png" style="display:block; margin:auto;" width="200px" height="200px" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<img id="bottom-left" src="https://www.yunting.cf/static/pictures/greenpoint.png" style="display:block; margin:auto;" width="30px" height="30px"/>
+					</div>
+					<div class="col-md-4">
+						<img id="bottom-center" src="https://www.yunting.cf/static/pictures/greenpoint.png" style="display:block; margin:auto;" width="30px" height="30px"/>
+					</div>
+					<div class="col-md-4">
+						<img id="bottom-right" src="https://www.yunting.cf/static/pictures/greenpoint.png" style="display:block; margin:auto;" width="30px" height="30px"/>
+					</div>
+				</div>
+				<!-- <input type="button" onclick="change_red('top-center')" value="改變圖案"> -->
+
+				<script>
+					function change_green(img_id)
+  					{
+  						document.getElementById(img_id).src="https://www.yunting.cf/static/pictures/greenpoint.png"
+  					};
+					function change_orange(img_id)
+  					{
+  						document.getElementById(img_id).src="https://www.yunting.cf/static/pictures/orangepoint.png"
+  					};
+					function change_red(img_id)
+  					{
+  						document.getElementById(img_id).src="https://www.yunting.cf/static/pictures/redpoint.png"
+  					};
+
+					
+				</script>
+			</div>
+		</div>
+	 </div>
+	<script>
+		$(document).ready(function(){
+			function get_gps(){
+				var lat_old = 0;
+				var lng_old = 0;
+				$.ajax({
+					url:"/sent_data/",
+					type: 'GET',
+					dataType:'JSON',
+					data: {},
+					success: function(res) {
+						if (res.lat != lat_old) {
+							document.getElementById("lat").innerHTML = res.lat;
+							document.getElementById("lng").innerHTML = res.lng;
+							//location.reload();
+							console.log(res.datetime);
+						}
+						console.log('get gps!')
+					},
+					error: function() {
+						console.log('ajax error!'); 
+					}
+				})
+			}
+			setInterval(get_gps, 5000)
+		})
+	</script>
+
+	<script>
+		var car_status = 'stop';
+		$(document).ready(function(){
+		// 	//forward
+		// 	$('#forward_Btn').mousedown(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"forward"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='forward';
+		// 					}
+		// 		})
+		// 	})
+		// 	$('#forward_Btn').mouseup(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"stop"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='stop';
+		// 					}
+		// 		})
+		// 	})
+		// 	//back
+		// 	$('#back_Btn').mousedown(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"back"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='back';
+		// 					}
+		// 		})
+		// 	})
+		// 	$('#back_Btn').mouseup(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"stop"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='stop';
+		// 					}
+		// 		})
+		// 	})
+		// 	//left
+		// 	$('#left_Btn').mousedown(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"left"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='left';
+		// 					}
+		// 		})
+		// 	})
+		// 	$('#left_Btn').mouseup(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"stop"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='stop';
+		// 					}
+		// 		})
+		// 	})
+		// 	//right
+		// 	$('#right_Btn').mousedown(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"right"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='right';
+		// 					}
+		// 		})
+		// 	})
+		// 	$('#right_Btn').mouseup(function(){
+		// 		$.ajax({
+		// 			type:"GET",
+		// 			url:"/send_django/",
+		// 			data:{"status":"stop"},
+		// 			dataType:"json",
+		// 			success: function(data){
+		// 					document.getElementById("Btn_status").innerHTML='stop';
+		// 					}
+		// 		})
+		// 	})
+			
+		})
+
+		console.log("touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
+
+		var joystick	= new VirtualJoystick({
+			container	: document.getElementById('container1'),
+			mouseSupport	: true,
+			//stickElement : document.getElementById('info'),
+			//baseElement : document.getElementById('info'),
+			
+		});
+		joystick.addEventListener('touchStart', function(){
+			console.log('down')
+		})
+		joystick.addEventListener('touchEnd', function(){
+			console.log('up')
+		})
+		setInterval(function(){
+			var outputEl	= document.getElementById('result');
+			outputEl.innerHTML	= '<b>Result:</b> '
+				+ ' dx:'+joystick.deltaX()
+				+ ' dy:'+joystick.deltaY()
+				+ (joystick.right()	? ' right'	: '')
+				+ (joystick.up()	? ' up'		: '')
+				+ (joystick.left()	? ' left'	: '')
+				+ (joystick.down()	? ' down' 	: '')	
+		}, 1/30 * 1000);
+		
+		setInterval(function(){
+			if (joystick.right() == true) {
+			car_status = "right";
+			console.log(car_status);
+			}
+			else if (joystick.up() == true) {
+				car_status = "forward";
+				console.log(car_status);
+			}
+			else if (joystick.left() == true) {
+				car_status = "left";
+				console.log(car_status);
+			}
+			else if (joystick.down() == true) {
+				car_status = "back";
+				console.log(car_status);
+			}
+			else {
+				car_status = "stop";
+				console.log(car_status);
+			}
+		}, 500);
+		//set data to /send_django
+		setInterval(function(){
+			$.ajax({
+				type:"GET",
+				url:"/send_django/",
+				data:{"status":car_status},
+				dataType:"json",
+				success: function(data){
+						console.log('send_finish!');
+						}
+			})
+		},500);
+	</script>
+
+	<!-- google map script -->
+	<script>
+		function initMap() {
+			var uluru = {lat: 24.1805, lng: 120.6479};
+			var map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 15,
+				center: uluru
+			});
+			var marker = new google.maps.Marker({
+				position: uluru,
+				map: map
+			});
+		}
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHLEBvw-N4QnZG9htLdtulKxKeftoCHFc&callback=initMap" async defer></script>
+	<!-- joystick js -->
+	<script>
+		
+	</script>
+</body>
+</html>

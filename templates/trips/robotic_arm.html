@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>機械手臂控制</title>
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <!--<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>-->
+
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+    <script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    
+    <style>
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 class="text-center font-weight-bold">自走車監控頁面</h1>
+    <div class="container-fluid">
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a id="toHome" href="/home">自走車院端控制</a></li>
+                    <li><a href="/GPS_Sheet">GPS狀態</a></li>
+                    <li><a href="/robotic_arm">機械手臂控制</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+    <div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="https://www.yunting.cf/static/pictures/robotic_arm.jpg" />
+            </div>
+            <div class="col-md-6">
+                <div class="slidecontainer">
+                    <input type="range" min="-90" max="90" value={{servo1}} class="slider" id="servo1">
+                    <button id="slide_btn1" type="button" class="btn btn-default">復位</button>
+                    <input type="range" min="-90" max="90" value={{servo2}} class="slider" id="servo2">
+                    <button id="slide_btn2" type="button" class="btn btn-default">復位</button>
+                    <input type="range" min="-90" max="90" value={{servo3}} class="slider" id="servo3">
+                    <button id="slide_btn3" type="button" class="btn btn-default">復位</button>
+                    <input type="range" min="-90" max="90" value={{servo4}} class="slider" id="servo4">
+                    <button id="slide_btn4" type="button" class="btn btn-default">復位</button>
+                    <input type="range" min="-90" max="90" value={{servo5}} class="slider" id="servo5">
+                    <button id="slide_btn5" type="button" class="btn btn-default">復位</button>
+                    <input type="range" min="-90" max="90" value={{servo6}} class="slider" id="servo6">
+                    <button id="slide_btn6" type="button" class="btn btn-default">復位</button>
+                </div>
+            </div>
+        </div>
+        <p id="s1"></p>
+    </div>
+    <script>
+        $(document).ready(function(){
+            var refresh = setInterval(get_value, 500)
+            function get_value(){
+                var slider1 = document.getElementById("servo1");
+                var slider2 = document.getElementById("servo2");
+                var slider3 = document.getElementById("servo3");
+                var slider4 = document.getElementById("servo4");
+                var slider5 = document.getElementById("servo5");
+                var slider6 = document.getElementById("servo6");
+                $.ajax({
+                    url:"/robotic_arm_value/",
+                    type: 'GET',
+                    dataType:'JSON',
+                    data: {'servo1':slider1.value,
+                        'servo2':slider2.value,
+                        'servo3':slider3.value,
+                        'servo4':slider4.value,
+                        'servo5':slider5.value,
+                        'servo6':slider6.value},
+                    success: function() {
+                        console.log('success!');
+                    },
+                    error: function() {
+                        console.log('ajax error!');
+                    }
+                })
+            };
+
+        })
+    </script>
+    <script>
+        $(document).ready(function() {
+            //復位
+            $('#slide_btn1').click(function () {
+                document.getElementById("servo1").value = 0;
+            })
+            $('#slide_btn2').click(function () {
+                document.getElementById("servo2").value = 0;
+            })
+            $('#slide_btn3').click(function () {
+                document.getElementById("servo3").value = 0;
+            })
+            $('#slide_btn4').click(function () {
+                document.getElementById("servo4").value = 0;
+            })
+            $('#slide_btn5').click(function () {
+                document.getElementById("servo5").value = 0;
+            })
+            $('#slide_btn6').click(function () {
+                document.getElementById("servo6").value = 0;
+            })
+        })
+    </script>
+</body>
+</html>

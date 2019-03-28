@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>自走車監控頁面</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- 新 Bootstrap4 核心 CSS 文件 -->
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+ 
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+ 
+<!-- popper.min.js 用于弹窗、提示、下拉菜单 -->
+<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+ 
+<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+<script src="https://intercoolerreleases-leaddynocom.netdna-ssl.com/intercooler-1.1.1.min.js"></script>
+{% load static %}
+<script src='{% static 'js/virtualjoystick.js' %}'></script>
+
+<style>
+    /* Always set the map height explicitly to define the size of the div
+    * element that contains the map. */
+	#map {
+    	height: 400px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+    }
+    /* Optional: Makes the sample page fill the window. */
+    html, body {
+    	height: 100%;
+        margin: 0;
+        padding: 0;
+	}
+	#joystick {
+		height:400px;
+		width:100%;
+		background-color:pink;
+	}
+	
+</style>
+</head>
+
+<body>
+	
+	<h1 class="text-center font-weight-bold">自走車監控頁面</h1>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="/home">IOT_LAB408</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="/GPS_Sheet">GPS_Sheet</a></li>
+					<li><a href="#">功能2</a></li>
+					<li class="dropdown">功能3</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<div class="row">
+		   	<div class="col-md-6">
+				<button id="forward_Btn" type="button" class="btn btn-default">前進</button>
+				<button id="back_Btn" type="button" class="btn btn-default">後退</button>
+				<button id="left_Btn" type="button" class="btn btn-default">左轉</button>
+				<button id="right_Btn" type="button" class="btn btn-default">右轉</button>
+				<p>現在車車狀態為:<a id='Btn_status'>none</a></p>
+				<div id='joystick'>
+					<br/>
+						Touch the screen and move
+						-
+						works with mouse too as debug
+					<br/>
+				<div id="result"></div>
+			</div>
+			</div>
+			
+		   	<div class="col-md-6">
+				<!-- google map -->
+				<div id="map"></div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+						<th>經緯度</th>
+						<th>座標</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+						<td>經度</td>
+						<td id="lng">{{latest.latitude}}</td>
+						</tr>
+						<tr>
+						<td>緯度</td>
+						<td id="lat">{{latest.longitude}}</td>
+						</tr>
+					</tbody>
+				</table>
+				<script>
+					function initMap() {
+					var uluru = {lat: 24.1805, lng: 120.6479};
+					var map = new google.maps.Map(document.getElementById('map'), {
+						zoom: 15,
+						center: uluru
+					});
+					var marker = new google.maps.Marker({
+						position: uluru,
+						map: map
+					});
+					}
+				</script>
+				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHLEBvw-N4QnZG9htLdtulKxKeftoCHFc&callback=initMap"
+				async defer></script>
+		    </div>
+		    
+		</div>
+		<div class="row">
+			<video poster="poster.png" height="720" width="1280" controls>
+				<source src="http://192.168.22.72/hls/mystream.m3u8" type="application/vnd.apple.mpegurl" />
+				<p class="warning">Your browser does not support HTML5 video.</p>
+			</video>
+		</div>
+	 </div>
+	
+	<script>
+		$(document).ready(function(){
+			function get_gps(){
+				$.ajax({
+					url:"/sent_data/",
+					type: 'GET',
+					dataType:'JSON',
+					data: {},
+					success: function(res) {
+						document.getElementById("lat").innerHTML = res.lat;
+						document.getElementById("lng").innerHTML = res.lng;
+						console.log(res.datetime);
+					},
+					error: function() {
+						console.log('ajax error!'); 
+					}
+				})
+			}
+			setInterval(get_gps, 5000)
+		})
+
+		$(document).ready(function(){
+			//forward
+			$('#forward_Btn').mousedown(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"forward"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='forward';
+							}
+				})
+			})
+			$('#forward_Btn').mouseup(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"stop"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='stop';
+							}
+				})
+			})
+			//back
+			$('#back_Btn').mousedown(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"back"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='back';
+							}
+				})
+			})
+			$('#back_Btn').mouseup(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"stop"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='stop';
+							}
+				})
+			})
+			//left
+			$('#left_Btn').mousedown(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"left"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='left';
+							}
+				})
+			})
+			$('#left_Btn').mouseup(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"stop"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='stop';
+							}
+				})
+			})
+			//right
+			$('#right_Btn').mousedown(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"right"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='right';
+							}
+				})
+			})
+			$('#right_Btn').mouseup(function(){
+				$.ajax({
+					type:"GET",
+					url:"/send_django/",
+					data:{"status":"stop"},
+					dataType:"json",
+					success: function(data){
+							document.getElementById("Btn_status").innerHTML='stop';
+							}
+				})
+			})
+
+		})
+	</script>
+	<script>
+		console.log("touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
+
+		var joystick	= new VirtualJoystick({
+			container	: document.getElementById('joystick'),
+			mouseSupport	: true,
+		});
+		joystick.addEventListener('touchStart', function(){
+			console.log('down')
+		})
+		joystick.addEventListener('touchEnd', function(){
+			console.log('up')
+		})
+		setInterval(function(){
+			var outputEl	= document.getElementById('result');
+			outputEl.innerHTML	= '<b>Result:</b> '
+				+ ' dx:'+joystick.deltaX()
+				+ ' dy:'+joystick.deltaY()
+				+ (joystick.right()	? ' right'	: '')
+				+ (joystick.up()	? ' up'		: '')
+				+ (joystick.left()	? ' left'	: '')
+				+ (joystick.down()	? ' down' 	: '')
+		}, 1/30 * 1000);
+	</script>
+	
+</body>
+</html>

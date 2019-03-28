@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>自走車監控頁面</title>
+    <!-- 新 Bootstrap4 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <!--<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>-->
+
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+
+    <script src="https://intercoolerreleases-leaddynocom.netdna-ssl.com/intercooler-1.1.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+    <h1 class="text-center font-weight-bold">自走車監控頁面</h1>
+    <div class="container-fluid">
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="/home">自走車院端控制</a></li>
+                    <li><a href="/GPS_Sheet">GPS狀態</a></li>
+                    <li><a href="/robotic_arm">機械手臂控制</a></li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div>
+    <div class="container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>時間</th>
+                        <th>緯度</th>
+                        <th>經度</th>
+                    </tr>
+                </thead>
+                <tbody id="sheet">
+                    {% for g in gps_sheet %}
+                    <tr>
+                        <td> {{ g.datetime }} </td>
+                        <td> {{ g.latitude }} </td>
+                        <td> {{ g.longitude }} </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            function refresh(){
+                $.ajax({
+					url:"/GPS_update/",
+					type: 'GET',
+					dataType:'JSON',
+					data: {},
+					success: function(res) {
+						var tableData="<tr>"
+                        tableData+="<td>"+res.datetime+"</td>"
+                        tableData+="<td>"+res.lat+"</td>"
+                        tableData+="<td>"+res.lng+"</td>"
+                        tableData+="</tr>"
+                        $("#sheet").append(tableData);
+					},
+					error: function() {
+						console.log('ajax error!'); 
+					}
+				})
+            }
+            setInterval(refresh,5000)
+        })
+
+    </script>
+</body>
+</html>

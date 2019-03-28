@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>即時影像串流</title>
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquerymobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <!-- 導入video.js -->
+    <link href="http://vjs.zencdn.net/5.5.3/video-js.css" rel="stylesheet">
+    <script src="http://vjs.zencdn.net/ie8/1.1.1/videojs-ie8.min.js"></script>
+    
+</head>
+<body>
+    <h1 class="text-center font-weight-bold">自走車監控頁面</h1>
+    <div class="container-fluid">
+        <div data-role="header">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="/home">自走車院端控制</a></li>
+                    <li><a href="/GPS_Sheet">GPS狀態</a></li>
+                    <li><a href="/robotic_arm">機械手臂控制</a></li>
+                    <li><a href="/video_stream">即時影像</a></li>
+                </ul>
+            </div>
+        </div>
+    <div>
+    <div class="container">
+        <div class="row">
+                <video id="video_1" class="video-js" controls preload="auto" width="640" height="480" poster="http://vjs.zencdn.net/v/oceans.png" data-setup="{}">
+                    <source src="rtmp://192.168.22.72/live/user1325" type="rtmp/flv">
+                    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+                </video>
+                <script src="http://vjs.zencdn.net/5.5.3/video.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>
